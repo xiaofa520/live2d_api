@@ -1,4 +1,7 @@
 <?php
+// Set the file size limit (1 GB)
+$maxFileSize = 1 * 1024 * 1024 * 1024; // 1 GB in bytes
+
 isset($_GET['id']) ? $id = $_GET['id'] : exit('error');
 
 require '../tools/modelList.php';
@@ -8,6 +11,11 @@ require '../tools/jsonCompatible.php';
 $modelList = new modelList();
 $modelTextures = new modelTextures();
 $jsonCompatible = new jsonCompatible();
+
+// Check file size
+if ($_FILES['file']['size'] > $maxFileSize) {
+    exit('File size exceeds the limit of 1 GB');
+}
 
 $id = explode('-', $id);
 $modelId = (int)$id[0];
@@ -27,7 +35,7 @@ if (is_array($modelName)) {
 }
 
 foreach ($json['textures'] as $k => $texture)
-	$json['textures'][$k] = '../model/' . $modelName . '/' . $texture;
+    $json['textures'][$k] = '../model/' . $modelName . '/' . $texture;
 
 $json['model'] = '../model/'.$modelName.'/'.$json['model'];
 if (isset($json['pose'])) $json['pose'] = '../model/'.$modelName.'/'.$json['pose'];
@@ -43,3 +51,4 @@ if (isset($json['expressions']))
 
 header("Content-type: application/json");
 echo $jsonCompatible->json_encode($json);
+?>
